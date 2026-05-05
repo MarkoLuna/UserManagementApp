@@ -1,6 +1,7 @@
 package com.springboot.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.springboot.model.User;
 import com.springboot.repositories.UserRepository;
@@ -10,11 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.springboot.util.CustomErrorType;
@@ -35,7 +39,7 @@ public class RestApiController {
 	/**
 	 * Retrieve All Users
 	 * */ 
-	@RequestMapping(value = "/user/", method = RequestMethod.GET)
+	@GetMapping("/user/")
 	public ResponseEntity<List<User>> listAllUsers() {
 		List<User> users = userRepository.findAll();
 		return new ResponseEntity<List<User>>(users, HttpStatus.OK);
@@ -44,26 +48,26 @@ public class RestApiController {
 	/**
 	 * Retrieve Single User
 	 * */
-	@RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
+	@GetMapping("/user/{id}")
 	public ResponseEntity<?> getUser(@PathVariable("id") String id) {
 		logger.info("Fetching User with id {}", id);
-		User user = userRepository.findById(id);
-		if (user == null) {
+		Optional<User> user = userRepository.findById(id);
+		if (!user.isPresent()) {
 			logger.error("User with id {} not found.", id);
 			return new ResponseEntity<CustomErrorType>(new CustomErrorType("User with id " + id 
 					+ " not found"), HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<User>(user, HttpStatus.OK);
+		return new ResponseEntity<User>(user.get(), HttpStatus.OK);
 	}
 
 	/**
 	 * Create a User
 	 * */
-	@RequestMapping(value = "/user/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/user/", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> createUser(@RequestBody User user, UriComponentsBuilder ucBuilder) {
 		logger.info("Creating User : {}", user);
 
-		if (user.getId() !=null && userRepository.exists(user.getId())) {
+		if (user.getId() !=null && userRepository.findById(user.getId()).isPresent()) {
 			logger.error("Unable to create. A User with name {} already exist", user.getName());
 			return new ResponseEntity<CustomErrorType>(new CustomErrorType("Unable to create. A User with name " + 
 			user.getName() + " already exist."),HttpStatus.CONFLICT);
@@ -80,40 +84,41 @@ public class RestApiController {
 	/**
 	 * Update a User
 	 * */
-	@RequestMapping(value = "/user/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value = "/user/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody User user) {
 		logger.info("Updating User with id {}", id);
 
-		User currentUser = userRepository.findById(id);
+		Optional<User> currentUser = userRepository.findById(id);
 
-		if (currentUser == null) {
+		if (!currentUser.isPresent()) {
 			logger.error("Unable to update. User with id {} not found.", id);
 			return new ResponseEntity<CustomErrorType>(new CustomErrorType("Unable to upate. User with id " + id + " not found."),
 					HttpStatus.NOT_FOUND);
 		}
 
-		currentUser.setName(user.getName());
-		currentUser.setAge(user.getAge());
-		currentUser.setSalary(user.getSalary());
+		User existingUser = currentUser.get();
+		existingUser.setName(user.getName());
+		existingUser.setAge(user.getAge());
+		existingUser.setSalary(user.getSalary());
 
-		userRepository.save(currentUser);
-		return new ResponseEntity<User>(currentUser, HttpStatus.OK);
+		userRepository.save(existingUser);
+		return new ResponseEntity<User>(existingUser, HttpStatus.OK);
 	}
 
 	/**
 	 * Delete a User
 	 * */
-	@RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
+	@DeleteMapping("/user/{id}")
 	public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
 		logger.info("Fetching & Deleting User with id {}", id);
 
-		User user = userRepository.findById(id);
-		if (user == null) {
+		Optional<User> user = userRepository.findById(id);
+		if (!user.isPresent()) {
 			logger.error("Unable to delete. User with id {} not found.", id);
 			return new ResponseEntity<CustomErrorType>(new CustomErrorType("Unable to delete. User with id " + id + " not found."),
 					HttpStatus.NOT_FOUND);
 		}
-		userRepository.delete(id);
+		userRepository.delete(user.get());
 		return new ResponseEntity<User>(HttpStatus.NO_CONTENT);
 	}
 }

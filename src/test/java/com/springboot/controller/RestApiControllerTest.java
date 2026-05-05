@@ -3,7 +3,7 @@ package com.springboot.controller;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,9 +27,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.http.MockHttpOutputMessage;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.springboot.SpringBootRestApiApp;
 import com.springboot.model.User;
@@ -37,7 +38,7 @@ import com.springboot.repositories.UserRepository;
 import com.springboot.security.AccountCredentials;
 import com.springboot.security.TokenAuthenticationService;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = SpringBootRestApiApp.class) 
 @AutoConfigureMockMvc
 public class RestApiControllerTest {
@@ -60,6 +61,9 @@ public class RestApiControllerTest {
     private UserRepository userRepository;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     void setConverters(HttpMessageConverter<?>[] converters) {
 
         this.mappingJackson2HttpMessageConverter = Arrays.asList(converters).stream()
@@ -67,17 +71,17 @@ public class RestApiControllerTest {
             .findAny()
             .orElse(null);
 
-        assertNotNull("the JSON message converter must not be null",
-                this.mappingJackson2HttpMessageConverter);
+        assertNotNull(this.mappingJackson2HttpMessageConverter,
+                "the JSON message converter must not be null");
     }
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         this.userRepository.deleteAll();
-        this.userList.add(new User("Marcos", 23, 30000, "password"));
-        this.userList.add(new User("Gerardo", 17, 1000,"password"));
+        this.userList.add(new User("Marcos", 23, 30000, passwordEncoder.encode("password")));
+        this.userList.add(new User("Gerardo", 17, 1000, passwordEncoder.encode("password")));
         
-        this.userRepository.save(userList);
+        this.userRepository.saveAll(userList);
         authToken();
     }
     
@@ -126,7 +130,7 @@ public class RestApiControllerTest {
         		.header(TokenAuthenticationService.HEADER_STRING, authTokenHeader)
         		.contentType(CONTENT_TYPE_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(CONTENT_TYPE_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].name", is(this.userList.get(0).getName())))
                 .andExpect(jsonPath("$[0].age", is(this.userList.get(0).getAge())))

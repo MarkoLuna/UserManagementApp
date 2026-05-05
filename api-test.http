@@ -1,0 +1,132 @@
+### Spring Boot MongoDB API Test Requests
+### Base URL: http://localhost:8080
+### All endpoints except /login require JWT authentication
+
+### 1. Authentication - Get JWT Token
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "Marcos",
+  "password": "password"
+}
+
+### 2. Get All Users (requires JWT token)
+### Extract token from login response body and use it here
+### Example response from login: {"token":"eyJhbGciOiJIUzUxMiJ9...","type":"Bearer","expiresIn":864000000}
+GET http://localhost:8080/api/user/
+Authorization: Bearer YOUR_JWT_TOKEN
+
+### 3. Get User by ID (requires JWT token)
+### Replace {user-id} and YOUR_JWT_TOKEN with actual values
+GET http://localhost:8080/api/user/{{user-id}}
+Authorization: Bearer YOUR_JWT_TOKEN
+
+### 4. Create New User (requires JWT token)
+POST http://localhost:8080/api/user/
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "name": "John Doe",
+  "age": 30,
+  "salary": 50000.0,
+  "password": "newpassword123"
+}
+
+### 5. Update User (requires JWT token)
+### Replace {user-id} and YOUR_JWT_TOKEN with actual values
+PUT http://localhost:8080/api/user/{{user-id}}
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "name": "John Updated",
+  "age": 31,
+  "salary": 55000.0,
+  "password": "updatedpassword123"
+}
+
+### 6. Delete User (requires JWT token)
+### Replace {user-id} and YOUR_JWT_TOKEN with actual values
+DELETE http://localhost:8080/api/user/{{user-id}}
+Authorization: Bearer YOUR_JWT_TOKEN
+
+### 7. Error Handling Examples
+
+#### Invalid Credentials
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "username": "invalid",
+  "password": "wrong"
+}
+
+#### Missing Token (should return 401 Unauthorized)
+GET http://localhost:8080/api/user/
+
+#### Invalid Token (should return 401 Unauthorized)
+GET http://localhost:8080/api/user/
+Authorization: Bearer invalid-token
+
+#### User Not Found (should return 404 Not Found)
+GET http://localhost:8080/api/user/507f1f77bcf86cd799439011
+Authorization: Bearer YOUR_JWT_TOKEN
+
+### 8. Complete Test Workflow Variables
+### Define variables for easier testing (supported by some HTTP clients)
+@baseUrl = http://localhost:8080
+@token = Bearer YOUR_JWT_TOKEN
+@userId = {{user-id}}
+
+### 9. Variable-based Requests (alternative format)
+
+### Login with variables
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "username": "Marcos",
+  "password": "password"
+}
+
+### Get all users with variables
+GET {{baseUrl}}/api/user/
+Authorization: {{token}}
+
+### Create user with variables
+POST {{baseUrl}}/api/user/
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "name": "Alice Smith",
+  "age": 28,
+  "salary": 45000.0,
+  "password": "alicepass123"
+}
+
+### Update user with variables
+PUT {{baseUrl}}/api/user/{{userId}}
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "name": "Alice Updated",
+  "age": 29,
+  "salary": 47000.0,
+  "password": "alicepass456"
+}
+
+### Delete user with variables
+DELETE {{baseUrl}}/api/user/{{userId}}
+Authorization: {{token}}
+
+### Notes:
+### 1. Login returns JSON: {"token":"eyJhbGciOiJIUzUxMiJ9...","type":"Bearer","expiresIn":864000000}
+### 2. Extract the token value and use it as: Authorization: Bearer <token>
+### 3. Replace {user-id} with actual user ID from create/get responses
+### 4. Some HTTP clients support variables (like @baseUrl) for easier testing
+### 5. The application creates sample users "Marcos" and "Gerardo" automatically
+### 6. JWT tokens are valid for 10 days by default

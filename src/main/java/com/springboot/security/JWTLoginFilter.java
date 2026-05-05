@@ -3,11 +3,12 @@ package com.springboot.security;
 import java.io.IOException;
 import java.util.Collections;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,9 +33,6 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
 		try{
 			AccountCredentials creds = new ObjectMapper().readValue(req.getInputStream(), AccountCredentials.class);
 			
-			ObjectMapper mapper = new ObjectMapper();
-			res.getWriter().append(mapper.writeValueAsString(creds));
-			
 			return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(creds.getUsername(),
 					creds.getPassword(), Collections.emptyList()));
 		}catch(JsonMappingException e){
@@ -47,8 +45,16 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
 	@Override
 	protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,
 			Authentication auth) throws IOException, ServletException {
-		TokenAuthenticationService.addAuthentication(res, auth.getName());
+		
+		// Generate JWT token
+		String token = TokenAuthenticationService.generateToken(auth.getName());
+		
+		// Set response content type
+		res.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		
+		// Create and write response body with token
+		LoginResponse loginResponse = new LoginResponse(token);
+		ObjectMapper mapper = new ObjectMapper();
+		res.getWriter().write(mapper.writeValueAsString(loginResponse));
 	}
-
 }
-//https://auth0.com/blog/securing-spring-boot-with-jwts/
