@@ -1,6 +1,8 @@
 # Spring Boot MongoDB BackEnd
 
-A comprehensive Spring Boot REST API application with MongoDB backend for user management with JWT authentication and CRUD operations.
+## Purpose
+
+The primary purpose of this application is for **User Management**. It provides a complete backend solution for managing user data, including secure authentication and full CRUD (Create, Read, Update, Delete) operations.
 
 ## Overview
 
