@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.angular/cache/
+target/
+*.class
+*.jar
+*.log
+.vscode/
+.DS_Store
+Thumbs.db

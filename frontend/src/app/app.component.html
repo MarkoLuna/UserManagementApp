@@ -1,0 +1,28 @@
+<mat-toolbar color="primary" class="app-toolbar">
+  <span class="app-title">{{ user }}</span>
+  <span class="spacer"></span>
+  <button mat-button routerLink="/home" routerLinkActive="active">
+    <mat-icon>home</mat-icon>
+    Home
+  </button>
+  <button mat-button routerLink="/about" routerLinkActive="active">
+    <mat-icon>contact_mail</mat-icon>
+    Contact
+  </button>
+  @if (authManagement.isAuthenticated()) {
+    <button mat-button (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      Logout
+    </button>
+  }
+</mat-toolbar>
+
+<div class="main-content">
+  <router-outlet></router-outlet>
+</div>
+
+<footer class="app-footer">
+  <mat-toolbar color="primary">
+    <span>&copy; Company {{ currentYear }}</span>
+  </mat-toolbar>
+</footer>
