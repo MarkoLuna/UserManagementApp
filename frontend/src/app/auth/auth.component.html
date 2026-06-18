@@ -1,0 +1,33 @@
+<mat-card class="login-card">
+  <mat-card-header>
+    <mat-card-title>Please Login</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form>
+      @if (errors) {
+        <mat-error class="error-message">
+          <mat-icon color="warn">error</mat-icon>
+          {{ error }}
+        </mat-error>
+      }
+      
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>User</mat-label>
+        <input matInput name="user" [(ngModel)]="user" placeholder="User" required autofocus>
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" name="password" [(ngModel)]="password" placeholder="Password" required>
+        <mat-icon matSuffix>lock</mat-icon>
+      </mat-form-field>
+    </form>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-raised-button color="primary" (click)="login($event)" class="login-button">
+      <mat-icon>login</mat-icon>
+      Login
+    </button>
+  </mat-card-actions>
+</mat-card>

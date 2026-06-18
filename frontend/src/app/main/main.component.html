@@ -1,0 +1,110 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title class="mat-headline-5">{{ title }}</mat-card-title>
+    <mat-card-subtitle>Spring Boot MVC, Angular 21, Angular Material Application</mat-card-subtitle>
+  </mat-card-header>
+</mat-card>
+
+<h5 class="mat-headline-4">Users</h5>
+<button mat-raised-button color="primary" (click)="newUser()">
+  <mat-icon>add</mat-icon>
+  New User
+</button>
+
+  @if (visibleAlert) {
+    <mat-card class="mat-elevation-z1" 
+        [ngClass]="{'mat-primary': success, 'mat-accent': info, 'mat-warn': warning || danger}">
+      <mat-card-content class="mat-body-1">
+        {{ message }}
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <table mat-table [dataSource]="userList" class="mat-elevation-z2">
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>#</th>
+      <td mat-cell *matCellDef="let row">{{ row.id }}</td>
+    </ng-container>
+    
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+    </ng-container>
+    
+    <ng-container matColumnDef="age">
+      <th mat-header-cell *matHeaderCellDef>Age</th>
+      <td mat-cell *matCellDef="let row">{{ row.age }}</td>
+    </ng-container>
+    
+    <ng-container matColumnDef="salary">
+      <th mat-header-cell *matHeaderCellDef>Salary</th>
+      <td mat-cell *matCellDef="let row">{{ row.salary | currency :'USD':true}}</td>
+    </ng-container>
+    
+    <ng-container matColumnDef="delete">
+      <th mat-header-cell *matHeaderCellDef>Delete</th>
+      <td mat-cell *matCellDef="let row">
+        <button mat-icon-button color="warn" (click)="deleteUser(row)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    
+    <ng-container matColumnDef="update">
+      <th mat-header-cell *matHeaderCellDef>Update</th>
+      <td mat-cell *matCellDef="let row">
+        <button mat-icon-button color="primary" (click)="viewUser(row)">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    
+    <ng-container matColumnDef="view">
+      <th mat-header-cell *matHeaderCellDef>View</th>
+      <td mat-cell *matCellDef="let row">
+        <button mat-icon-button (click)="viewUser(row)">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    
+    <tr mat-header-row *matHeaderRowDef="['id', 'name', 'age', 'salary', 'delete', 'update', 'view']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['id', 'name', 'age', 'salary', 'delete', 'update', 'view'];"></tr>
+  </table>
+
+  @if (user) {
+    <mat-card class="mat-elevation-z2" style="margin-top: 20px;">
+      <mat-card-header>
+        <mat-card-title>User Form</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>ID</mat-label>
+            <input matInput disabled [value]="user.id" placeholder="auto generated">
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Name</mat-label>
+            <input matInput [(ngModel)]="user.name" [ngModelOptions]="{standalone: true}" placeholder="Name">
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Age</mat-label>
+            <input matInput type="number" [(ngModel)]="user.age" [ngModelOptions]="{standalone: true}" placeholder="Age">
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Salary</mat-label>
+            <input matInput type="number" [(ngModel)]="user.salary" [ngModelOptions]="{standalone: true}" placeholder="Salary">
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="save()">Submit</button>
+        <button mat-stroked-button (click)="cancel()">Cancel</button>
+      </mat-card-actions>
+    </mat-card>
+  }
+
+  

@@ -1,0 +1,75 @@
+<mat-card class="contact-card">
+  <mat-card-header>
+    <mat-card-title class="mat-headline-4">Contact Us</mat-card-title>
+    <mat-card-subtitle class="mat-body-1">Have a question or want further information?</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <p class="mat-body-1">Fill in the short form and we will get back to you as soon as possible.</p>
+    
+    <form class="contact-form" action="" method="post" id="contact-us-all" novalidate="novalidate">
+      <input name="elqSiteId" type="hidden" value="928">
+      <input name="sFDCLastCampaignID" type="hidden" value="701400000012Lql">
+      <input name="elqFormName" type="hidden" value="EMEAAllContactUsSubmissions">
+      <input name="nexturl" type="hidden" value="">
+      <input name="Partner" type="hidden" value="">
+      <input name="language" type="hidden" value="en">
+      
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>First Name</mat-label>
+          <input matInput id="exampleInputFirstName" name="C_FirstName" placeholder="Enter first name" required>
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Last Name</mat-label>
+          <input matInput id="exampleInputLastName" name="C_LastName" placeholder="Enter last name" required>
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Email</mat-label>
+          <input matInput id="exampleInputEmail1" name="C_EmailAddress" placeholder="Enter email" required>
+          <mat-icon matSuffix>email</mat-icon>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Company</mat-label>
+          <input matInput id="exampleInputCompany" name="C_Company" placeholder="Enter company">
+          <mat-icon matSuffix>business</mat-icon>
+        </mat-form-field>
+      </div>
+      
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Country</mat-label>
+        <mat-select id="C_Country" name="C_Country" placeholder="Choose country">
+          @for (country of countries; track country[0]) {
+            <mat-option [value]="country[0]">{{ country[1] }}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>public</mat-icon>
+      </mat-form-field>
+                    
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Phone</mat-label>
+        <input matInput id="C_BusPhone" name="C_BusPhone" placeholder="Phone">
+        <mat-icon matSuffix>phone</mat-icon>
+      </mat-form-field>
+              
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Message</mat-label>
+        <textarea matInput name="Comments" id="Comments" rows="5" placeholder="Enter your message here"></textarea>
+        <mat-icon matSuffix>comment</mat-icon>
+      </mat-form-field>
+                    
+      <div class="form-actions">
+        <button mat-raised-button color="primary" type="submit" id="contacts-submit">
+          <mat-icon>send</mat-icon>
+          CONTACT US
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
