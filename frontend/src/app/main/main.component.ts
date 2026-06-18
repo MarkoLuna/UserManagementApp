@@ -1,6 +1,6 @@
 import { User } from './../user';
 import { Alerts } from './../alerts';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponseBase } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -38,7 +38,7 @@ export class MainComponent implements OnInit {
 
   title = 'Spring Boot Rest Api App ';
   baseUrl = 'http://127.0.0.1:8080/SpringBootRestApi/api/user/';
-  userList!: User[];
+  userList: User[] = [];
   user!: User | null;
 
   visibleAlert: Boolean = false;
@@ -51,7 +51,8 @@ export class MainComponent implements OnInit {
   constructor(private route: ActivatedRoute,
     private router: Router,
     private http: HttpClient, 
-    private authManagement: AuthJWTManagementService ) {}
+    private authManagement: AuthJWTManagementService,
+    private cdr: ChangeDetectorRef ) {}
 
   ngOnInit(): void {
     this.obtainAllUsers();
@@ -88,8 +89,8 @@ export class MainComponent implements OnInit {
       };
     this.http.get<User[]>(this.baseUrl, data).subscribe({
       next: (data: User[]) => {
-        // console.log(data);
         this.userList = data;
+        this.cdr.detectChanges();
       },
       error: (err: HttpResponseBase) => {
         console.log(err);
@@ -101,10 +102,18 @@ export class MainComponent implements OnInit {
     this.user = new User();
   }
 
-  createUser() {
-    // console.log('createUser');
+  private authHeaders() {
+    return {
+      headers: new HttpHeaders()
+        .set(this.authManagement.AUTH_TOKEN_HEADER, this.authManagement.getToken())
+        .set('Content-Type', 'application/json')
+        .set('Accept', 'application/json'),
+      withCredentials: true
+    };
+  }
 
-    this.http.post<User>(this.baseUrl, this.user).subscribe((data: User) => {
+  createUser() {
+    this.http.post<User>(this.baseUrl, this.user, this.authHeaders()).subscribe((data: User) => {
       this.obtainAllUsers();
       this.cancel();
       this.showAlert('User ' + data.name + ' Created successfully', Alerts.ALERT_TYPE_SUCCESS);
@@ -112,14 +121,14 @@ export class MainComponent implements OnInit {
   }
 
   deleteUser(user: User) {
-    this.http.delete<User>(this.baseUrl + user.id).subscribe((data: User) => {
+    this.http.delete<User>(this.baseUrl + user.id, this.authHeaders()).subscribe((data: User) => {
       this.obtainAllUsers();
       this.showAlert('User ' + user.name + ' Deleted successfully', Alerts.ALERT_TYPE_INFO);
     });
   }
 
   updateUser() {
-    this.http.put<User>(this.baseUrl + this.user!.id, this.user).subscribe((data: User) => {
+    this.http.put<User>(this.baseUrl + this.user!.id, this.user, this.authHeaders()).subscribe((data: User) => {
       console.log(data);
       this.obtainAllUsers();
       this.cancel();
@@ -141,6 +150,7 @@ export class MainComponent implements OnInit {
     this.http.get<User>(this.baseUrl + user.id, data).subscribe((data: User) => {
       console.log(data);
       this.user = data;
+      this.cdr.detectChanges();
     });
   }
 
@@ -157,6 +167,8 @@ export class MainComponent implements OnInit {
     }else if (typeAlert === Alerts.ALERT_TYPE_DANGER) {
       this.danger = true;
     }
+
+    this.cdr.detectChanges();
 
     setTimeout(() => {
       this.visibleAlert = false;
