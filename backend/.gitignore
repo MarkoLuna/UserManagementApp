@@ -14,3 +14,7 @@ logs/
 .DS_Store
 
 SpringBootRestApiExample.iml
+
+*.class
+
+*.jar
