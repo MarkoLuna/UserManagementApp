@@ -5,10 +5,10 @@
   <mat-card-content>
     <form>
       @if (errors) {
-        <mat-error class="error-message">
+        <div class="error-message" role="alert">
           <mat-icon color="warn">error</mat-icon>
           {{ error }}
-        </mat-error>
+        </div>
       }
       
       <mat-form-field appearance="outline" class="full-width">

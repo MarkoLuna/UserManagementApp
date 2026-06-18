@@ -9,7 +9,8 @@ A full-stack **User Management** system composed of a **Spring Boot REST API** b
 ```
 UserManagementSpringBootApp/
 ├── backend/      # Spring Boot REST API (Java 21 + MongoDB)
-└── frontend/     # Angular 21 frontend
+├── frontend/     # Angular 21 frontend
+└── e2e/          # End-to-end tests (Playwright)
 ```
 
 ---
@@ -36,6 +37,13 @@ UserManagementSpringBootApp/
 | Node / npm | npm ≥ 11.10.0 | Package management |
 | Angular CLI | — | Build & dev tooling |
 
+### E2E Tests (`e2e/`)
+
+| Technology | Version | Purpose |
+|---|---|---|
+| Playwright | ^1.52.0 | End-to-end testing framework |
+| Node / npm | npm ≥ 11.10.0 | Package management |
+
 ---
 
 ## Features
@@ -46,6 +54,7 @@ UserManagementSpringBootApp/
 - **Automatic Data Seeding** — Sample users created on backend startup
 - **RESTful API** — Clean REST endpoints consumed by the Angular frontend
 - **Docker Support** — Easy containerized deployment for the backend + database
+- **E2E Testing** — Playwright-based end-to-end tests covering all user CRUD operations
 
 ---
 
@@ -223,6 +232,37 @@ cd backend
 cd frontend
 npm run build           # Production build → dist/
 ```
+
+### E2E Tests
+
+```bash
+cd e2e
+npm install             # Install dependencies
+npx playwright install  # Install browsers (first time only)
+
+# Start backend + frontend first, then:
+npm test                # Run all tests headlessly
+npm run test:headed     # Run tests with visible browser
+npm run test:debug      # Run tests in debug mode
+npm run test:ui         # Open Playwright UI mode
+```
+
+The e2e tests require both the **backend** (API on port 8080) and **frontend** (dev server on port 4200) to be running.
+
+#### E2E Test Specs
+
+**Authentication** (`tests/auth.spec.ts`)
+- Login with valid credentials
+- Login with invalid credentials
+- Redirect to login when unauthenticated
+- Logout
+
+**User CRUD** (`tests/users-crud.spec.ts`)
+- Read: view seed users in table, view user details
+- Create: single user, multiple users
+- Update: edit user, partial update
+- Delete: remove a user
+- Full CRUD workflow (create → view → update → delete)
 
 ---
 

@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -35,7 +35,8 @@ export class AuthComponent implements OnInit {
 
   constructor(private route: ActivatedRoute,
     private router: Router,
-    private authManagement: AuthJWTManagementService) { }
+    private authManagement: AuthJWTManagementService,
+    private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
   }
@@ -61,11 +62,22 @@ export class AuthComponent implements OnInit {
         console.log('credenciales erroneas');
       }
     }).catch((data: HttpErrorResponse) => {
-      const error = JSON.parse(data.error);
-      if (error.error === 'Unauthorized' || error.status === 401) {
-        this.error = error.message;
+      if (data.error && typeof data.error === 'string') {
+        try {
+          const error = JSON.parse(data.error);
+          if (error.error === 'Unauthorized' || error.status === 401) {
+            this.error = error.message;
+            this.errors = true;
+          }
+        } catch {
+          this.error = 'Invalid credentials';
+          this.errors = true;
+        }
+      } else {
+        this.error = 'Invalid credentials';
         this.errors = true;
       }
+      this.cdr.detectChanges();
     });
   }
 

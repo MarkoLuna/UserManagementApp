@@ -46,8 +46,11 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
 	protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,
 			Authentication auth) throws IOException, ServletException {
 		
-		// Generate JWT token
-		String token = TokenAuthenticationService.generateToken(auth.getName());
+		// Generate JWT token and add it as response header
+		TokenAuthenticationService.addAuthentication(res, auth.getName());
+		
+		// Get the generated token from the response header
+		String token = res.getHeader(TokenAuthenticationService.HEADER_STRING);
 		
 		// Set response content type
 		res.setContentType(MediaType.APPLICATION_JSON_VALUE);
