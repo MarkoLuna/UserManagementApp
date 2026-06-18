@@ -15,9 +15,11 @@ It serves as the frontend layer for the Spring Boot REST API, communicating over
 
 ## Project Structure
 
-The Angular application lives at the root of the repository.
+The Angular application lives in the `frontend/` directory of the monorepo.
 
 ## Development Server
+
+> Make sure you are in the `frontend/` directory before running these commands.
 
 **Prerequisites:** 
 - `npm` version `11.10.0` or higher is required. This is necessary to support the modern security features (`min-release-age` and `ignore-scripts`) configured in the `.npmrc` file.
