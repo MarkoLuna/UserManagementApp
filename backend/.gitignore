@@ -1,0 +1,16 @@
+
+.classpath
+
+.project
+
+.idea/
+
+target/
+
+logs/
+
+.settings/
+
+.DS_Store
+
+SpringBootRestApiExample.iml
