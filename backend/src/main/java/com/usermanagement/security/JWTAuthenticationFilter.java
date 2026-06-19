@@ -1,4 +1,4 @@
-package com.springboot.security;
+package com.usermanagement.security;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -23,14 +23,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JWTAuthenticationFilter extends GenericFilterBean {
 
 	@Override
-	public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain)
-			throws IOException, ServletException {
+	public void doFilter(
+		ServletRequest req,
+		ServletResponse res,
+		FilterChain filterChain
+	) throws IOException, ServletException {
 
-		try{
+		try {
 			Authentication authentication = TokenAuthenticationService.getAuthentication((HttpServletRequest) req);
 			SecurityContextHolder.getContext().setAuthentication(authentication);
-		}catch (AuthenticationServiceException e){
+		} catch (AuthenticationServiceException e) {
 			SecurityContextHolder.getContext().setAuthentication(null);
+
 			ObjectMapper mapper = new ObjectMapper();
 			
 			((HttpServletResponse )res).setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -41,6 +45,7 @@ public class JWTAuthenticationFilter extends GenericFilterBean {
 			
 			mapper.writeValue(res.getWriter(), tokenMap);
 		}
+
 		filterChain.doFilter(req, res);
 	}
 }

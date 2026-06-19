@@ -1,14 +1,14 @@
-package com.springboot.security;
+package com.usermanagement.security;
 
-import com.springboot.model.User;
-import com.springboot.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import com.usermanagement.model.User;
+import com.usermanagement.repositories.UserRepository;
 
 import java.util.Collection;
 
@@ -17,7 +17,6 @@ public class CustomUserService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    @Autowired
     public CustomUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }

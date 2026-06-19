@@ -1,4 +1,4 @@
-package com.springboot.security;
+package com.usermanagement.security;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -32,12 +32,22 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
 
 		try{
 			AccountCredentials creds = new ObjectMapper().readValue(req.getInputStream(), AccountCredentials.class);
-			
-			return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(creds.getUsername(),
-					creds.getPassword(), Collections.emptyList()));
+
+			return getAuthenticationManager().authenticate(
+				new UsernamePasswordAuthenticationToken(
+					creds.getUsername(),
+					creds.getPassword(),
+					Collections.emptyList()
+				)
+			);
 		}catch(JsonMappingException e){
-			return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken("",
-					"", Collections.emptyList()));
+			return getAuthenticationManager().authenticate(
+				new UsernamePasswordAuthenticationToken(
+					"",
+					"",
+					Collections.emptyList()
+				)
+			);
 		}
 		
 	}

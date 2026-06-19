@@ -1,10 +1,11 @@
-package com.springboot.repositories;
+package com.usermanagement.repositories;
 
-import com.springboot.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
+
+import com.usermanagement.model.User;
 
 public interface UserRepository extends MongoRepository<User, String>{
 	
-		public User findByName(String name);
+	User findByName(String name);
 	
 }

@@ -1,15 +1,15 @@
-package com.springboot.security;
+package com.usermanagement.security;
 
 public class LoginResponse {
     private String token;
     private String type;
     private long expiresIn;
-    
+
     public LoginResponse() {
         this.type = "Bearer";
         this.expiresIn = 864000000; // 10 days in milliseconds
     }
-    
+
     public LoginResponse(String token) {
         this();
         this.token = token;

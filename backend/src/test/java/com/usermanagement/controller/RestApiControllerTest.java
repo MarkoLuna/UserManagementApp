@@ -1,4 +1,4 @@
-package com.springboot.controller;
+package com.usermanagement.controller;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.hasSize;
@@ -12,9 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,36 +22,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.mock.http.MockHttpOutputMessage;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.springboot.SpringBootRestApiApp;
-import com.springboot.model.User;
-import com.springboot.repositories.UserRepository;
-import com.springboot.security.AccountCredentials;
-import com.springboot.security.TokenAuthenticationService;
+import com.usermanagement.SpringBootRestApiApp;
+import com.usermanagement.model.User;
+import com.usermanagement.repositories.UserRepository;
+import com.usermanagement.security.AccountCredentials;
+import com.usermanagement.security.TokenAuthenticationService;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = SpringBootRestApiApp.class) 
 @AutoConfigureMockMvc
 public class RestApiControllerTest {
-	
-	private MediaType CONTENT_TYPE_JSON = new MediaType(MediaType.APPLICATION_JSON.getType(),
-            MediaType.APPLICATION_JSON.getSubtype(),
-            Charset.forName("utf8"));
     
     @Autowired
     private MockMvc mockMvc;
     
     private String authTokenHeader = "";
 
-    @SuppressWarnings("rawtypes")
-	private HttpMessageConverter mappingJackson2HttpMessageConverter;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private List<User> userList = new ArrayList<>();
 
@@ -62,18 +55,6 @@ public class RestApiControllerTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    void setConverters(HttpMessageConverter<?>[] converters) {
-
-        this.mappingJackson2HttpMessageConverter = Arrays.asList(converters).stream()
-            .filter(hmc -> hmc instanceof MappingJackson2HttpMessageConverter)
-            .findAny()
-            .orElse(null);
-
-        assertNotNull(this.mappingJackson2HttpMessageConverter,
-                "the JSON message converter must not be null");
-    }
 
     @BeforeEach
     public void setup() throws Exception {
@@ -88,13 +69,9 @@ public class RestApiControllerTest {
     public void authToken() throws Exception {
     	AccountCredentials accountCredentials = new AccountCredentials("Marcos", "password");
     	
-    	MediaType CONTENT_TYPE_TEXT = new MediaType(MediaType.TEXT_PLAIN.getType(),
-                MediaType.TEXT_PLAIN.getSubtype(),
-                Charset.forName("utf8"));
-    	
     	MvcResult mvcResult = mockMvc.perform(post("/login")
     			.content(this.json(accountCredentials))
-    			.contentType(CONTENT_TYPE_TEXT))
+    			.contentType(MediaType.APPLICATION_JSON))
     			.andExpect(status().isOk())
     	.andExpect(header().string(TokenAuthenticationService.HEADER_STRING, notNullValue()))
     	.andReturn();
@@ -110,7 +87,7 @@ public class RestApiControllerTest {
     	mockMvc.perform(get("/api/user/12")
 				.header(TokenAuthenticationService.HEADER_STRING, authTokenHeader)
     			.content(this.json(new User()))
-    			.contentType(CONTENT_TYPE_JSON))
+    			.contentType(MediaType.APPLICATION_JSON))
     	.andExpect(status().isNotFound());
     }
 
@@ -118,7 +95,7 @@ public class RestApiControllerTest {
     public void readSingleUser() throws Exception {
         mockMvc.perform(get("/api/user/" + this.userList.get(0).getId())
         		.header(TokenAuthenticationService.HEADER_STRING, authTokenHeader)
-        		.contentType(CONTENT_TYPE_JSON))
+        		.contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is(this.userList.get(0).getName())))
                 .andExpect(jsonPath("$.age", is(this.userList.get(0).getAge())));
@@ -128,7 +105,7 @@ public class RestApiControllerTest {
     public void readPeople() throws Exception {
         mockMvc.perform(get("/api/user/")
         		.header(TokenAuthenticationService.HEADER_STRING, authTokenHeader)
-        		.contentType(CONTENT_TYPE_JSON))
+        		.contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -144,16 +121,12 @@ public class RestApiControllerTest {
 
         this.mockMvc.perform(post("/api/user/")
         		.header(TokenAuthenticationService.HEADER_STRING, authTokenHeader)
-                .contentType(CONTENT_TYPE_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(userJson))
                 .andExpect(status().isCreated());
     }
 
-    @SuppressWarnings("unchecked")
 	protected String json(Object o) throws IOException {
-        MockHttpOutputMessage mockHttpOutputMessage = new MockHttpOutputMessage();
-        this.mappingJackson2HttpMessageConverter.write(
-                o, MediaType.APPLICATION_JSON, mockHttpOutputMessage);
-        return mockHttpOutputMessage.getBodyAsString();
+        return objectMapper.writeValueAsString(o);
     }
 }
